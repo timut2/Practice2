@@ -1,0 +1,50 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <div >Register please: </div>
+        <div>
+            <div>
+                <input type="text" id="inputField1" name="username">
+                <input type="password" id="inputField2" name="password"> <!-- Fixed typo from 'pinputField2' to 'inputField2' -->
+                <input type="button" value="Submit" onclick="sendPostRequest()"> <!-- Changed to 'type="button"' to prevent form submission if within a form -->
+            </div>
+        </div>
+        <a href="http://localhost:8080/login">Sing up!</a>
+        <script>
+        async function sendPostRequest() {
+            // Get the values from input fields
+            const fieldValue1 = document.getElementById('inputField1').value;
+            const fieldValue2 = document.getElementById('inputField2').value;
+
+            // Prepare the data to be sent in the POST request
+            const postData = {
+                username: fieldValue1,
+                password: fieldValue2
+            };
+
+            try {
+                const response = await fetch('register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                });
+                
+                if (response.ok) { 
+                    const jsonResponse = await response.json();
+                    console.log('Server response:', jsonResponse);
+                    window.location.href = "http://localhost:8080/login";
+                } else {
+                    console.error('Error in response:', response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error('Error in fetch:', error);
+            }
+        }
+        </script>
+    </body>
+    </html>
