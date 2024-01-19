@@ -14,6 +14,18 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type album struct {
+	ID     string `json:"id"`
+	Title  string `json:"Title"`
+	Artist string `json:"artist"`
+	Price  string `json:"price"`
+}
+
+var albums = []album{
+	{ID: "1", Title: "Jeru", Artist: "Jacob Benjamin Gyllenhaal", Price: "100"},
+	{ID: "2", Title: "Jeru2", Artist: "Jacob Benjamin Gyllenhaal2", Price: "1002"},
+}
+
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -167,6 +179,30 @@ func userIsLoggedIn(c *gin.Context) bool {
 	return user != nil
 }
 
+func postAlbum(c *gin.Context) {
+	var newAlbum album
+	if err := c.BindJSON(&newAlbum); err != nil {
+		return
+	}
+	albums = append(albums, newAlbum)
+	c.IndentedJSON(http.StatusCreated, newAlbum)
+}
+
+func getAlbum(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, albums)
+}
+
+func getAlbumById(c *gin.Context) {
+	id := c.Param("id")
+	for _, a := range albums {
+		if a.ID == id {
+			c.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"answer": "no album with such ID"})
+}
+
 func main() {
 	r := gin.Default()
 	store := cookie.NewStore([]byte("secret"))
@@ -176,6 +212,9 @@ func main() {
 	r.POST("/register", pregister)
 	r.GET("/register", gregister)
 	r.GET("/login", glogin)
+	r.GET("/albums/:id", getAlbumById)
+	r.GET("/albums", getAlbum)
+	r.POST("/albums", postAlbum)
 	r.POST("/login", plogin)
 	r.GET("/main", gmain)
 	r.POST("/main", pmain)
